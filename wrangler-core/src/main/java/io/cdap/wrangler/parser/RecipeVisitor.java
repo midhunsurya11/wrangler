@@ -22,6 +22,7 @@ import io.cdap.wrangler.api.SourceInfo;
 import io.cdap.wrangler.api.Triplet;
 import io.cdap.wrangler.api.parser.Bool;
 import io.cdap.wrangler.api.parser.BoolList;
+import io.cdap.wrangler.api.parser.ByteSize;
 import io.cdap.wrangler.api.parser.ColumnName;
 import io.cdap.wrangler.api.parser.ColumnNameList;
 import io.cdap.wrangler.api.parser.DirectiveName;
@@ -33,7 +34,9 @@ import io.cdap.wrangler.api.parser.Properties;
 import io.cdap.wrangler.api.parser.Ranges;
 import io.cdap.wrangler.api.parser.Text;
 import io.cdap.wrangler.api.parser.TextList;
+import io.cdap.wrangler.api.parser.TimeDuration;
 import io.cdap.wrangler.api.parser.Token;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -316,6 +319,52 @@ public final class RecipeVisitor extends DirectivesBaseVisitor<RecipeSymbol.Buil
     builder.addToken(new TextList(strs));
     return builder;
   }
+  @Override
+    public RecipeSymbol.Builder visitByteSizeArg(DirectivesParser.ByteSizeArgContext ctx) {
+        String value = ctx.ByteSize().getText();
+        builder.addToken(new ByteSize(value));
+        return builder;
+    }
+
+    /**
+     * Visits time duration arguments like "100ms", "5s" etc
+     */
+    @Override
+    public RecipeSymbol.Builder visitTimeDurationArg(DirectivesParser.TimeDurationArgContext ctx) {
+        String value = ctx.TimeDuration().getText();
+        builder.addToken(new TimeDuration(value));
+        return builder;
+    }
+
+    /**
+     * Modify the existing value visitor to handle ByteSize and TimeDuration
+     */
+    @Override 
+    public RecipeSymbol.Builder visitValue(DirectivesParser.ValueContext ctx) {
+        if (ctx.ByteSize() != null) {
+            String value = ctx.ByteSize().getText();
+            builder.addToken(new ByteSize(value));
+            return builder;
+        } else if (ctx.TimeDuration() != null) {
+            String value = ctx.TimeDuration().getText();
+            builder.addToken(new TimeDuration(value));
+            return builder;
+        }
+
+        // Handle existing value types
+        if (ctx.String() != null) {
+            String value = ctx.String().getText();
+            builder.addToken(new Text(value.substring(1, value.length() - 1)));
+        } else if (ctx.Number() != null) {
+            LazyNumber number = new LazyNumber(ctx.Number().getText());
+            builder.addToken(new Numeric(number));
+        } else if (ctx.Column() != null) {
+            builder.addToken(new ColumnName(ctx.Column().getText().substring(1))); 
+        } else if (ctx.Bool() != null) {
+            builder.addToken(new Bool(Boolean.valueOf(ctx.Bool().getText())));
+        }
+        return builder;
+    }
 
   private SourceInfo getOriginalSource(ParserRuleContext ctx) {
     int a = ctx.getStart().getStartIndex();

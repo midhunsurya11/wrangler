@@ -49,6 +49,7 @@ statements
  :  ( Comment | macro | directive ';' | pragma ';' | ifStatement)*
  ;
 
+
 directive
  : command
   (   codeblock
@@ -64,6 +65,8 @@ directive
     | stringList
     | numberRanges
     | properties
+    | byteSizeArg 
+    | timeDurationArg 
   )*?
   ;
 
@@ -139,8 +142,19 @@ numberRange
  : Number ':' Number '=' value
  ;
 
+//added new rule
+
+ byteSizeArg
+ : ByteSize
+ ;
+
+timeDurationArg
+ : TimeDuration
+ ;
+
+ // added two parser rule
 value
- : String | Number | Column | Bool
+ : String | Number | Column | Bool | ByteSize | TimeDuration
  ;
 
 ecommand
@@ -299,6 +313,30 @@ Comment
  : ('//' ~[\r\n]* | '/*' .*? '*/' | '--' ~[\r\n]* ) -> skip
  ;
 
+// rules added
+
+ByteSize
+ : Number ByteUnit
+ ;
+
+TimeDuration
+ : Number TimeUnit
+ ;
+
+fragment ByteUnit
+ : [kKmMgGtTpP][bB]  // Supports KB, MB, GB, TB, PB (case insensitive)
+ ;
+
+fragment TimeUnit
+ : 'ms'    // milliseconds
+ | 's'     // seconds
+ | 'm'     // minutes
+ | 'h'     // hours
+ | 'd'     // days
+ ;
+
+//end
+
 Space
  : [ \t\r\n\u000C]+ -> skip
  ;
@@ -311,3 +349,5 @@ fragment Int
 fragment Digit
  : [0-9]
  ;
+
+

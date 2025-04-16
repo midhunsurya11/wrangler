@@ -22,6 +22,20 @@ are manually created.
 
 More [here](wrangler-docs/upcoming-features.md) on upcoming features.
 
+### New Parsers and Aggregation
+
+* **ByteSize and TimeDuration Parsers** - New parsers for handling data sizes and time durations
+  * ByteSize parser supports units: B, KB, MB, GB, TB, PB
+  * TimeDuration parser supports units: ms, s, m, h, d
+  * Used with the new aggregate-stats directive for calculating totals
+
+Example usage:
+```
+// Aggregate total size and time with custom units
+aggregate-stats :data_size :process_time total_gb total_minutes GB m
+```
+
+
   * **User Defined Directives, also known as UDD**, allow you to create custom functions to transform records within CDAP DataPrep or a.k.a Wrangler. CDAP comes with a comprehensive library of functions. There are however some omissions, and some specific cases for which UDDs are the solution. Additional information on how you can build your custom directives [here](wrangler-docs/custom-directive.md).
     * Migrating directives from version 1.0 to version 2.0 [here](wrangler-docs/directive-migration.md)
     * Information about Grammar [here](wrangler-docs/grammar/grammar-info.md)
@@ -82,7 +96,12 @@ These directives are currently available:
 | [Parse as Simple Date](wrangler-docs/directives/parse-as-simple-date.md)        | Parses date strings                                              |
 | [Parse XML To JSON](wrangler-docs/directives/parse-xml-to-json.md)              | Parses an XML document into a JSON structure                     |
 | [Parse as Currency](wrangler-docs/directives/parse-as-currency.md)              | Parses a string representation of currency into a number.        |
-| [Parse as Datetime](wrangler-docs/directives/parse-as-datetime.md)              | Parses strings with datetime values to CDAP datetime type        |
+| [Parse as Datetime](wrangler-docs/directives/parse-as-datetime.md)              | Parses strings with datetime values to CDAP datetime type        |                   |
+| [Parse as ByteSize](wrangler-docs/directives/parse-as-bytesize.md)          | Parses string values representing data sizes with units (B, KB, MB, GB, TB) |
+| [Parse as TimeDuration](wrangler-docs/directives/parse-as-timeduration.md)  | Parses string values representing time durations (ms, s, m, h) |
+
+
+
 | **Output Formatters**                                                  |                                                                  |
 | [Write as CSV](wrangler-docs/directives/write-as-csv.md)                        | Converts a record into CSV format                                |
 | [Write as JSON](wrangler-docs/directives/write-as-json-map.md)                  | Converts the record into a JSON map                              |

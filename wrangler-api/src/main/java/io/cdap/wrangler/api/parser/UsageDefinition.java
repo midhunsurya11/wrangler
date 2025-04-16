@@ -233,6 +233,13 @@ public final class UsageDefinition implements Serializable {
       currentOrdinal++;
       tokens.add(spec);
     }
+    public void defineByteSize(String name, boolean optional) {
+            // Implementation as provided earlier
+    }
+
+    public void defineTimeDuration(String name, boolean optional) {
+            // Implementation as provided earlier
+    }
 
     /**
      * @return a instance of <code>UsageDefinition</code> object.
